@@ -2,6 +2,7 @@ package com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Event;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
+import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Ref;
 import lombok.Value;
 import org.junit.After;
 import org.junit.Before;
@@ -41,8 +42,7 @@ public class InProcessEventLogTests {
 
         Topic topic = new Topic("some-topic");
         eventLog.subscribe(topic, handler);
-        eventLog.publish(topic, new Event() {
-        });
+        eventLog.publish(topic, () -> null);
 
         assertThat(handler.isInvoked()).isTrue();
     }
@@ -57,5 +57,9 @@ public class InProcessEventLogTests {
 
     @Value
     private static class TestEvent implements Event {
+        @Override
+        public Ref getRef() {
+            return null;
+        }
     }
 }
