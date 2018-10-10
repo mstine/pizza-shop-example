@@ -53,15 +53,14 @@ final class DefaultKitchenService implements KitchenService {
 				Pizza pizza = pizzaRepository.findByRef(pbfe.getRef());
 				KitchenOrderRef kitchenOrderRef = pizza.getKitchenOrderRef();
 				KitchenOrder kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
+
 				if (kitchenOrder.isBaking()) {
 					kitchenOrder.startAssembly();
-				} else {
-					long remainingPizzas = pizzaRepository.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
-							.filter(Pizza::isBaking)
-							.count();
-					if (remainingPizzas == 0) {
-						kitchenOrder.finishAssembly();
-					}
+				}
+
+				if (pizzaRepository.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
+						.allMatch(Pizza::hasFinishedBaking)) {
+					kitchenOrder.finishAssembly();
 				}
 			}
 		});

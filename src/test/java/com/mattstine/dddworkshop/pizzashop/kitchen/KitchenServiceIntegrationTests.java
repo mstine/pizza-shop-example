@@ -195,5 +195,29 @@ public class KitchenServiceIntegrationTests {
 		assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
 	}
 
+	@Test
+	public void test_bug_only_one_pizza_would_never_finish() {
+		kitchenOrderRef = kitchenOrderRepository.nextIdentity();
 
+		kitchenOrder = KitchenOrder.builder()
+				.ref(kitchenOrderRef)
+				.onlineOrderRef(new OnlineOrderRef())
+				.eventLog(eventLog)
+				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
+				.build();
+		kitchenOrderRepository.add(kitchenOrder);
+
+
+		kitchenOrder.startPrep();
+
+		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+				.forEach(Pizza::finishPrep);
+
+		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+				.forEach(pizza -> kitchenService.removePizzaFromOven(pizza.getRef()));
+
+		kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
+
+		assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
+	}
 }
