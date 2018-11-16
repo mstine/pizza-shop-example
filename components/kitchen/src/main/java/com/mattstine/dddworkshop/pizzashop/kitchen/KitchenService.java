@@ -7,7 +7,7 @@ import java.util.Set;
 /**
  * @author Matt Stine
  */
-public interface KitchenService {
+interface KitchenService {
 	void startOrderPrep(KitchenOrderRef kitchenOrderRef);
 
 	void finishPizzaPrep(PizzaRef ref);

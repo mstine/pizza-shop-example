@@ -96,6 +96,7 @@ public class KitchenServiceIntegrationTests {
 				.count()).isEqualTo(2);
 	}
 
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
 	@Test
 	public void on_pizzaPrepFinished_start_pizzaBake() {
 		kitchenOrder.startPrep();
@@ -150,6 +151,7 @@ public class KitchenServiceIntegrationTests {
 		assertThat(kitchenOrder.isPrepping()).isTrue();
 	}
 
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
 	@Test
 	public void should_finish_pizza_prep() {
 		kitchenOrder.startPrep();
@@ -164,6 +166,7 @@ public class KitchenServiceIntegrationTests {
 		assertThat(pizza.isBaking()).isTrue();
 	}
 
+	@SuppressWarnings("OptionalGetWithoutIsPresent")
 	@Test
 	public void should_remove_pizza_from_oven() {
 		kitchenOrder.startPrep();

@@ -1,6 +1,6 @@
 package com.mattstine.dddworkshop.pizzashop.ordering;
 
-public interface OrderingService {
+interface OrderingService {
     OnlineOrderRef createOrder(OnlineOrder.Type type);
 
     void addPizza(OnlineOrderRef ref, Pizza pizza);
