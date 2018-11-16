@@ -6,7 +6,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentRef;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.NonNull;

@@ -1,7 +1,7 @@
 package com.mattstine.dddworkshop.pizzashop.ordering;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Repository;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentRef;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
 
 /**
  * @author Matt Stine

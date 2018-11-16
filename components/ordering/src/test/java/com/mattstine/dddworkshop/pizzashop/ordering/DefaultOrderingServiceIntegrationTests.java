@@ -3,9 +3,9 @@ package com.mattstine.dddworkshop.pizzashop.ordering;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentRef;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentService;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentSuccessfulEvent;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentService;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentSuccessfulEvent;
 import org.junit.Before;
 import org.junit.Test;
 

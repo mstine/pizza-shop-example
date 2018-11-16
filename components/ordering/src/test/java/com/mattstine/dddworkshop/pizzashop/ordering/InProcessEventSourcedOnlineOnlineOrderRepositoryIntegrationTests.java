@@ -2,7 +2,7 @@ package com.mattstine.dddworkshop.pizzashop.ordering;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentRef;
+import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
