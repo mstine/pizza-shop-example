@@ -3,10 +3,10 @@ package com.mattstine.dddworkshop.pizzashop.delivery;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventHandler;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
-import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrderRef;
-import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenService;
-import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OrderingService;
+import com.mattstine.dddworkshop.pizzashop.delivery.acl.kitchen.KitchenOrderRef;
+import com.mattstine.dddworkshop.pizzashop.delivery.acl.kitchen.KitchenService;
+import com.mattstine.dddworkshop.pizzashop.delivery.acl.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.delivery.acl.ordering.OrderingService;
 import org.junit.Before;
 import org.junit.Test;
 
