@@ -19,10 +19,6 @@ public final class Pizza {
 		this.size = size;
 	}
 
-	Amount calculatePrice() {
-		return size.getPrice();
-	}
-
 	public enum Size {
 		MEDIUM(Amount.of(6, 0));
 
@@ -30,10 +26,6 @@ public final class Pizza {
 
 		Size(Amount price) {
 			this.price = price;
-		}
-
-		public Amount getPrice() {
-			return price;
 		}
 	}
 }

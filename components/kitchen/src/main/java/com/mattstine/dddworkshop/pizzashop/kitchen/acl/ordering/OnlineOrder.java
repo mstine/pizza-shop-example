@@ -33,24 +33,8 @@ public class OnlineOrder {
 		this.state = State.NEW;
 	}
 
-	boolean isPickupOrder() {
-		return this.type == Type.PICKUP;
-	}
-
-	boolean isDeliveryOrder() {
-		return this.type == Type.DELIVERY;
-	}
-
 	public boolean isNew() {
 		return state == State.NEW;
-	}
-
-	boolean isSubmitted() {
-		return this.state == State.SUBMITTED;
-	}
-
-	boolean isPaid() {
-		return state == State.PAID;
 	}
 
 	public void addPizza(Pizza pizza) {
@@ -58,10 +42,10 @@ public class OnlineOrder {
 	}
 
 	enum State {
-		NEW, SUBMITTED, PAID
+		NEW
 	}
 
 	public enum Type {
-		IDENTITY, DELIVERY, PICKUP
+		DELIVERY, PICKUP
 	}
 }
