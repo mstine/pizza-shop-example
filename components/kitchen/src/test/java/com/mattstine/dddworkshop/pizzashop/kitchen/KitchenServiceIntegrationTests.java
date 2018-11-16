@@ -2,10 +2,10 @@ package com.mattstine.dddworkshop.pizzashop.kitchen;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrder;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderPaidEvent;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.ordering.OrderingService;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrder;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderPaidEvent;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OrderingService;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -63,8 +63,8 @@ public class KitchenServiceIntegrationTests {
 				.ref(ref)
 				.build();
 
-		onlineOrder.addPizza(com.mattstine.dddworkshop.pizzashop.ordering.Pizza.builder()
-				.size(com.mattstine.dddworkshop.pizzashop.ordering.Pizza.Size.MEDIUM)
+		onlineOrder.addPizza(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.builder()
+				.size(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.Size.MEDIUM)
 				.build());
 
 		when(orderingService.findByRef(eq(ref))).thenReturn(onlineOrder);

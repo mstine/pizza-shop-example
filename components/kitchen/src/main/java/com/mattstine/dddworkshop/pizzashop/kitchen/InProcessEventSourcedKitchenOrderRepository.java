@@ -3,7 +3,7 @@ package com.mattstine.dddworkshop.pizzashop.kitchen;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.adapters.InProcessEventSourcedRepository;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
 
 import java.util.HashMap;
 import java.util.Map;

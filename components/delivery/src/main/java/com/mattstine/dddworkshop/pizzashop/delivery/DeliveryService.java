@@ -6,9 +6,9 @@ import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrder;
 import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrderAssemblyFinishedEvent;
 import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrderRef;
 import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenService;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrder;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.ordering.OrderingService;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrder;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OrderingService;
 
 /**
  * @author Matt Stine

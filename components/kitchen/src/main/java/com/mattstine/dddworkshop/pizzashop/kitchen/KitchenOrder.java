@@ -5,7 +5,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Singular;

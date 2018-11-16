@@ -3,7 +3,7 @@ package com.mattstine.dddworkshop.pizzashop.delivery;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrderRef;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

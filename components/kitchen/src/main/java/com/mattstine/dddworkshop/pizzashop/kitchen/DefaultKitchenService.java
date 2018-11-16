@@ -2,10 +2,10 @@ package com.mattstine.dddworkshop.pizzashop.kitchen;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrder;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderPaidEvent;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.ordering.OrderingService;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrder;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderPaidEvent;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
+import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OrderingService;
 import lombok.Value;
 
 import java.util.Set;
@@ -155,7 +155,7 @@ final class DefaultKitchenService implements KitchenService {
 	}
 
 	@SuppressWarnings("SameReturnValue")
-	private KitchenOrder.Pizza.Size onlineOrderPizzaSizeToKitchenPizzaSize(com.mattstine.dddworkshop.pizzashop.ordering.Pizza.Size orderingSize) {
+	private KitchenOrder.Pizza.Size onlineOrderPizzaSizeToKitchenPizzaSize(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.Size orderingSize) {
 		switch (orderingSize) {
 			case MEDIUM:
 				return KitchenOrder.Pizza.Size.MEDIUM;
