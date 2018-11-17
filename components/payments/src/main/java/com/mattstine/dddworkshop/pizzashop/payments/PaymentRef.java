@@ -17,7 +17,7 @@ public final class PaymentRef implements Ref {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private PaymentRef(String reference) {
+    PaymentRef(String reference) {
         this.reference = reference;
     }
 }
