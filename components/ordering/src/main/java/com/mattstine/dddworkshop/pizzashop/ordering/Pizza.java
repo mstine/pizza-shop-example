@@ -24,7 +24,8 @@ public final class Pizza {
     }
 
     public enum Size {
-        MEDIUM(Amount.of(6, 0));
+        MEDIUM(Amount.of(6, 0)),
+        LARGE(Amount.of(8, 9));
 
         final Amount price;
 
