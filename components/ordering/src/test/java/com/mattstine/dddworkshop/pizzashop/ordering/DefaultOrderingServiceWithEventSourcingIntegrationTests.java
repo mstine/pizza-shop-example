@@ -1,11 +1,11 @@
 package com.mattstine.dddworkshop.pizzashop.ordering;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
 import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentService;
 import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentSuccessfulEvent;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ import static org.mockito.Mockito.mock;
  */
 public class DefaultOrderingServiceWithEventSourcingIntegrationTests {
 
-    private EventLog eventLog;
+    private InProcessEventLog eventLog;
     private OnlineOrderRepository repository;
 
     @Before
@@ -26,6 +26,11 @@ public class DefaultOrderingServiceWithEventSourcingIntegrationTests {
         repository = new InProcessEventSourcedOnlineOrderRepository(eventLog,
                 new Topic("ordering"));
         new DefaultOrderingService(eventLog, repository, mock(PaymentService.class));
+    }
+
+    @After
+    public void tearDown() {
+        eventLog.purgeSubscribers();
     }
 
     @Test
