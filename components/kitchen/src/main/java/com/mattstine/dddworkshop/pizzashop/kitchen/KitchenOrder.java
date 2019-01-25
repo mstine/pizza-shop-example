@@ -6,10 +6,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
 import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.NonFinal;
 
 import java.util.List;
@@ -22,6 +19,7 @@ public final class KitchenOrder implements Aggregate {
     List<Pizza> pizzas;
     EventLog $eventLog;
     @NonFinal
+    @Setter(AccessLevel.PACKAGE)
     State state;
 
     @Builder

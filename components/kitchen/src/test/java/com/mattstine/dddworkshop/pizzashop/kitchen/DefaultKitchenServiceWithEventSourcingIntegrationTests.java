@@ -17,7 +17,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class KitchenServiceIntegrationTests {
+public class DefaultKitchenServiceWithEventSourcingIntegrationTests {
 
 	private InProcessEventLog eventLog;
 	private KitchenService kitchenService;

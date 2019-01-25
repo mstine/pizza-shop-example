@@ -14,7 +14,7 @@ public final class KitchenOrderRef implements Ref {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private KitchenOrderRef(String reference) {
+    public KitchenOrderRef(String reference) {
         this.reference = reference;
     }
 

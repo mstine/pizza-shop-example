@@ -11,7 +11,7 @@ import org.junit.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-public class KitchenServiceTests {
+public class DefaultKitchenServiceTests {
 
 	private KitchenService service;
 	private KitchenOrderRepository kitchenOrderRepository;
