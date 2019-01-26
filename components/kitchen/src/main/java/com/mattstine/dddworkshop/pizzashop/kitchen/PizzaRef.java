@@ -14,7 +14,7 @@ public final class PizzaRef implements Ref {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private PizzaRef(String reference) {
+    PizzaRef(String reference) {
         this.reference = reference;
     }
 
