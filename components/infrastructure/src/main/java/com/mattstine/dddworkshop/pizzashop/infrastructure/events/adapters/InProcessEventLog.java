@@ -14,7 +14,7 @@ import java.util.*;
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InProcessEventLog implements EventLog {
-    private final Map<Topic, Set<EventHandler>> topics = new HashMap<>();
+    private final Map<Topic, List<EventHandler>> topics = new HashMap<>();
     private final Map<Topic, List<Event>> events = new HashMap<>();
     private static InProcessEventLog singleton;
 
@@ -29,20 +29,20 @@ public final class InProcessEventLog implements EventLog {
     public void publish(Topic topic, Event event) {
         List<Event> events = this.events.computeIfAbsent(topic, k -> new ArrayList<>());
         events.add(event);
-        Set<EventHandler> subscribers = this.topics.computeIfAbsent(topic, k -> new HashSet<>());
+        List<EventHandler> subscribers = this.topics.computeIfAbsent(topic, k -> new ArrayList<>());
         subscribers
                 .forEach(subscriber -> subscriber.handleEvent(event));
     }
 
     @Override
     public void subscribe(Topic topic, EventHandler handler) {
-        Set<EventHandler> subscribers = this.topics.computeIfAbsent(topic, k -> new HashSet<>());
+        List<EventHandler> subscribers = this.topics.computeIfAbsent(topic, k -> new ArrayList<>());
         subscribers.add(handler);
     }
 
     @Override
     public int getNumberOfSubscribers(Topic topic) {
-        return this.topics.computeIfAbsent(topic, k -> new HashSet<>()).size();
+        return this.topics.computeIfAbsent(topic, k -> new ArrayList<>()).size();
     }
 
     @Override

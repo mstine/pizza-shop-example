@@ -39,8 +39,8 @@ public class DefaultKitchenServiceWithJdbcIntegrationTests {
 		pool = JdbcConnectionPool.create("jdbc:h2:mem:test;MVCC=FALSE", "", "");
 		kitchenOrderRepository = new EmbeddedJdbcKitchenOrderRepository(eventLog,
 				new Topic("kitchen_orders"), pool);
-		pizzaRepository = new InProcessEventSourcedPizzaRepository(eventLog,
-				new Topic("pizzas"));
+		pizzaRepository = new EmbeddedJdbcPizzaRepository(eventLog,
+				new Topic("pizzas"), pool);
 		orderingService = mock(OrderingService.class);
 		kitchenService = new DefaultKitchenService(eventLog, kitchenOrderRepository, pizzaRepository, orderingService);
 		kitchenOrderRef = kitchenOrderRepository.nextIdentity();

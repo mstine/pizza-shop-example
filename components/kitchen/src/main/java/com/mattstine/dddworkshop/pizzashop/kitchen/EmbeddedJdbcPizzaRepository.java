@@ -1,6 +1,5 @@
 package com.mattstine.dddworkshop.pizzashop.kitchen;
 
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Ref;
@@ -10,6 +9,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Set;
 
 public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
@@ -25,20 +25,88 @@ public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
 
         try (Connection connection = pool.getConnection()) {
             PreparedStatement statement = connection
-                .prepareStatement("CREATE TABLE PIZZAS (REF VARCHAR(255), SIZE INT, KITCHEN_ORDER_REF VARCHAR(255), STATE INT)");
+                    .prepareStatement("CREATE TABLE PIZZAS (REF VARCHAR(255), SIZE INT, KITCHEN_ORDER_REF VARCHAR(255), STATE INT)");
             statement.execute();
         } catch (SQLException e) {
             throw new RuntimeException("Unable to initialize PIZZAS table: ", e);
         }
 
         eventLog.subscribe(new Topic("pizzas"), e -> {
-
+            if (e instanceof PizzaPrepStartedEvent) {
+                PizzaPrepStartedEvent ppse = (PizzaPrepStartedEvent) e;
+                try (Connection connection = pool.getConnection()) {
+                    PreparedStatement statement = connection
+                            .prepareStatement("UPDATE PIZZAS SET STATE = ? WHERE REF = ?");
+                    statement.setInt(1, Pizza.State.PREPPING.ordinal());
+                    statement.setString(2, ppse.getRef().getReference());
+                    statement.execute();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Unable to update STATE in PIZZAS table: ", ex);
+                }
+            } else if (e instanceof PizzaPrepFinishedEvent) {
+                PizzaPrepFinishedEvent ppfe = (PizzaPrepFinishedEvent) e;
+                try (Connection connection = pool.getConnection()) {
+                    PreparedStatement statement = connection
+                            .prepareStatement("UPDATE PIZZAS SET STATE = ? WHERE REF = ?");
+                    statement.setInt(1, Pizza.State.PREPPED.ordinal());
+                    statement.setString(2, ppfe.getRef().getReference());
+                    statement.execute();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Unable to update STATE in PIZZAS table: ", ex);
+                }
+            } else if (e instanceof PizzaBakeStartedEvent) {
+                PizzaBakeStartedEvent pbse = (PizzaBakeStartedEvent) e;
+                try (Connection connection = pool.getConnection()) {
+                    PreparedStatement statement = connection
+                            .prepareStatement("UPDATE PIZZAS SET STATE = ? WHERE REF = ?");
+                    statement.setInt(1, Pizza.State.BAKING.ordinal());
+                    statement.setString(2, pbse.getRef().getReference());
+                    statement.execute();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Unable to update STATE in PIZZAS table: ", ex);
+                }
+            } else if (e instanceof PizzaBakeFinishedEvent) {
+                PizzaBakeFinishedEvent pbfe = (PizzaBakeFinishedEvent) e;
+                try (Connection connection = pool.getConnection()) {
+                    PreparedStatement statement = connection
+                            .prepareStatement("UPDATE PIZZAS SET STATE = ? WHERE REF = ?");
+                    statement.setInt(1, Pizza.State.BAKED.ordinal());
+                    statement.setString(2, pbfe.getRef().getReference());
+                    statement.execute();
+                } catch (SQLException ex) {
+                    throw new RuntimeException("Unable to update STATE in PIZZAS table: ", ex);
+                }
+            }
         });
     }
 
     @Override
     public Set<Pizza> findPizzasByKitchenOrderRef(KitchenOrderRef kitchenOrderRef) {
-        return null;
+        Set<Pizza> pizzas = new HashSet<>();
+        try (Connection connection = pool.getConnection()) {
+            PreparedStatement statement = connection.prepareStatement("SELECT REF, SIZE, KITCHEN_ORDER_REF, STATE FROM PIZZAS WHERE KITCHEN_ORDER_REF = ?");
+            statement.setString(1, kitchenOrderRef.getReference());
+            ResultSet resultSet = statement.executeQuery();
+            while (resultSet.next()) {
+                PizzaRef pizzaRef = new PizzaRef(resultSet.getString(1));
+                int size = resultSet.getInt(2);
+                KitchenOrderRef kor = new KitchenOrderRef(resultSet.getString(3));
+                int state = resultSet.getInt(4);
+
+                Pizza pizza = Pizza.builder()
+                        .ref(pizzaRef)
+                        .size(Pizza.Size.values()[size])
+                        .kitchenOrderRef(kor)
+                        .eventLog(eventLog)
+                        .build();
+                pizza.setState(Pizza.State.values()[state]);
+                pizzas.add(pizza);
+            }
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Unable to retrieve Pizzas from PIZZAS table: ", e);
+        }
+        return pizzas;
     }
 
     @Override
