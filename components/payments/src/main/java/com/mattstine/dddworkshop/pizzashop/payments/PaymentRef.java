@@ -1,7 +1,7 @@
 package com.mattstine.dddworkshop.pizzashop.payments;
 
-import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Ref;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.domain.services.RefStringGenerator;
+import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Ref;
 import lombok.Value;
 
 /**
@@ -17,7 +17,7 @@ public final class PaymentRef implements Ref {
     }
 
     @SuppressWarnings("SameParameterValue")
-    private PaymentRef(String reference) {
+    PaymentRef(String reference) {
         this.reference = reference;
     }
 }

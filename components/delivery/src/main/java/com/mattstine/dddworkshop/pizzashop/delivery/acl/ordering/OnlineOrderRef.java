@@ -12,7 +12,7 @@ import lombok.experimental.NonFinal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class OnlineOrderRef {
-	public static final OnlineOrderRef IDENTITY = new OnlineOrderRef("");
-	@NonFinal
-	String reference;
+    public static final OnlineOrderRef IDENTITY = new OnlineOrderRef("");
+    @NonFinal
+    String reference;
 }

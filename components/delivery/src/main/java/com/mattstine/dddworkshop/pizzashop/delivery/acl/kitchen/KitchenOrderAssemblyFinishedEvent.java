@@ -8,5 +8,5 @@ import lombok.Value;
  */
 @Value
 public class KitchenOrderAssemblyFinishedEvent implements Event {
-	KitchenOrderRef ref;
+    KitchenOrderRef ref;
 }

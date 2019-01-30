@@ -8,17 +8,17 @@ import java.util.Set;
  * @author Matt Stine
  */
 interface KitchenService {
-	void startOrderPrep(KitchenOrderRef kitchenOrderRef);
+    void startOrderPrep(KitchenOrderRef kitchenOrderRef);
 
-	void finishPizzaPrep(PizzaRef ref);
+    void finishPizzaPrep(PizzaRef ref);
 
-	void removePizzaFromOven(PizzaRef ref);
+    void removePizzaFromOven(PizzaRef ref);
 
-	KitchenOrder findKitchenOrderByOnlineOrderRef(OnlineOrderRef onlineOrderRef);
+    KitchenOrder findKitchenOrderByOnlineOrderRef(OnlineOrderRef onlineOrderRef);
 
-	KitchenOrder findKitchenOrderByRef(KitchenOrderRef kitchenOrderRef);
+    KitchenOrder findKitchenOrderByRef(KitchenOrderRef kitchenOrderRef);
 
-	Pizza findPizzaByRef(PizzaRef ref);
+    Pizza findPizzaByRef(PizzaRef ref);
 
-	Set<Pizza> findPizzasByKitchenOrderRef(KitchenOrderRef kitchenOrderRef);
+    Set<Pizza> findPizzasByKitchenOrderRef(KitchenOrderRef kitchenOrderRef);
 }

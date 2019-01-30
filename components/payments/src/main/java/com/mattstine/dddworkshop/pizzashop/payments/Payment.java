@@ -6,10 +6,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.NonFinal;
 
 import java.util.function.BiFunction;
@@ -26,6 +23,7 @@ public final class Payment implements Aggregate {
     PaymentRef ref;
     EventLog $eventLog;
     @NonFinal
+    @Setter(AccessLevel.PACKAGE)
     State state;
 
     @Builder

@@ -6,10 +6,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
 import com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.OnlineOrderRef;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Singular;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.NonFinal;
 
 import java.util.List;
@@ -22,6 +19,7 @@ public final class KitchenOrder implements Aggregate {
     List<Pizza> pizzas;
     EventLog $eventLog;
     @NonFinal
+    @Setter(AccessLevel.PACKAGE)
     State state;
 
     @Builder
@@ -69,8 +67,8 @@ public final class KitchenOrder implements Aggregate {
     }
 
     void startBake() {
-		if (this.state != State.PREPPING) {
-			throw new IllegalStateException("Can only startBake on PREPPING KitchenOrder");
+        if (this.state != State.PREPPING) {
+            throw new IllegalStateException("Can only startBake on PREPPING KitchenOrder");
         }
 
         this.state = State.BAKING;
@@ -88,8 +86,8 @@ public final class KitchenOrder implements Aggregate {
     }
 
     void startAssembly() {
-		if (this.state != State.BAKING) {
-			throw new IllegalStateException("Can only startAssembly on BAKING KitchenOrder");
+        if (this.state != State.BAKING) {
+            throw new IllegalStateException("Can only startAssembly on BAKING KitchenOrder");
         }
 
         this.state = State.ASSEMBLING;
@@ -108,7 +106,7 @@ public final class KitchenOrder implements Aggregate {
 
     void finishAssembly() {
         if (this.state != State.ASSEMBLING) {
-			throw new IllegalStateException("Can only finishAssembly on ASSEMBLING KitchenOrder");
+            throw new IllegalStateException("Can only finishAssembly on ASSEMBLING KitchenOrder");
         }
 
         this.state = State.ASSEMBLED;

@@ -7,10 +7,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
 import com.mattstine.dddworkshop.pizzashop.ordering.acl.payments.PaymentRef;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.NonFinal;
 
 import java.util.ArrayList;
@@ -29,8 +26,10 @@ public final class OnlineOrder implements Aggregate {
     OnlineOrderRef ref;
     List<Pizza> pizzas;
     @NonFinal
+    @Setter(AccessLevel.PACKAGE)
     State state;
     @NonFinal
+    @Setter(AccessLevel.PACKAGE)
     PaymentRef paymentRef;
 
     @Builder
@@ -209,7 +208,6 @@ public final class OnlineOrder implements Aggregate {
                 onlineOrder.state = State.SUBMITTED;
                 return onlineOrder;
             } else if (onlineOrderEvent instanceof PaymentRefAssignedEvent) {
-                @SuppressWarnings("SpellCheckingInspection")
                 PaymentRefAssignedEvent prae = (PaymentRefAssignedEvent) onlineOrderEvent;
                 onlineOrder.paymentRef = prae.getPaymentRef();
                 return onlineOrder;

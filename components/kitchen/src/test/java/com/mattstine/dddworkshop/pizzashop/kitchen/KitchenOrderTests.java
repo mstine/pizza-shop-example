@@ -64,7 +64,7 @@ public class KitchenOrderTests {
     }
 
     @Test
-	public void only_prepping_order_can_start_bake() {
+    public void only_prepping_order_can_start_bake() {
         assertThatIllegalStateException().isThrownBy(kitchenOrder::startBake);
     }
 

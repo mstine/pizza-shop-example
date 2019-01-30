@@ -6,15 +6,15 @@ import lombok.Value;
 
 @Value
 public final class PizzaRef implements Ref {
-    String reference;
     public static final PizzaRef IDENTITY = new PizzaRef("");
+    String reference;
 
     public PizzaRef() {
         this.reference = RefStringGenerator.generateRefString();
     }
 
     @SuppressWarnings("SameParameterValue")
-    private PizzaRef(String reference) {
+    PizzaRef(String reference) {
         this.reference = reference;
     }
 
