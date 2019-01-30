@@ -7,7 +7,7 @@ import lombok.Value;
  * @author Matt Stine
  */
 @Value
-final class DeliveryOrderAddedEvent implements DeliveryOrderEvent, RepositoryAddEvent {
-	DeliveryOrderRef ref;
-	DeliveryOrder.OrderState state;
+class DeliveryOrderAddedEvent implements DeliveryOrderEvent, RepositoryAddEvent {
+    DeliveryOrderRef ref;
+    DeliveryOrder.OrderState state;
 }

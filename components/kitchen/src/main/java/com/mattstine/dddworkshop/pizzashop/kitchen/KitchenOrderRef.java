@@ -9,7 +9,7 @@ public final class KitchenOrderRef implements Ref {
     public static final KitchenOrderRef IDENTITY = new KitchenOrderRef("");
     private String reference;
 
-    public  KitchenOrderRef() {
+    public KitchenOrderRef() {
         reference = RefStringGenerator.generateRefString();
     }
 

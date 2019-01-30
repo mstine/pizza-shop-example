@@ -4,6 +4,7 @@ import com.mattstine.dddworkshop.pizzashop.delivery.acl.kitchen.KitchenOrderRef;
 import com.mattstine.dddworkshop.pizzashop.delivery.acl.ordering.OnlineOrderRef;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
+import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Ref;
 import org.h2.jdbcx.JdbcConnectionPool;
 
 import java.sql.Connection;
@@ -13,7 +14,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmbeddedJdbcDeliveryOrderRepository implements DeliveryOrderRepository {
+final class EmbeddedJdbcDeliveryOrderRepository implements DeliveryOrderRepository {
 
 
     private final EventLog eventLog;
@@ -41,6 +42,7 @@ public class EmbeddedJdbcDeliveryOrderRepository implements DeliveryOrderReposit
         return new DeliveryOrderRef();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void add(DeliveryOrder deliveryOrder) {
         try (Connection connection = pool.getConnection()) {
@@ -68,36 +70,10 @@ public class EmbeddedJdbcDeliveryOrderRepository implements DeliveryOrderReposit
 
     @Override
     public DeliveryOrder findByRef(DeliveryOrderRef ref) {
-        DeliveryOrder deliveryOrder = null;
+        DeliveryOrder deliveryOrder;
         try (Connection connection = pool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT REF, KITCHEN_ORDER_REF, ONLINE_ORDER_REF, STATE FROM DELIVERY_ORDERS WHERE REF = ?");
-            statement.setString(1, ref.getReference());
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.first()) {
-                DeliveryOrderRef dor = new DeliveryOrderRef(resultSet.getString(1));
-                KitchenOrderRef kitchenOrderRef = new KitchenOrderRef(resultSet.getString(2));
-                OnlineOrderRef onlineOrderRef = new OnlineOrderRef(resultSet.getString(3));
-                int state = resultSet.getInt(4);
-
-                statement = connection.prepareStatement("SELECT REF, INDEX, SIZE FROM DELIVERY_ORDER_PIZZAS WHERE REF = ? ORDER BY INDEX");
-                statement.setString(1, dor.getReference());
-                resultSet = statement.executeQuery();
-
-                List<DeliveryOrder.Pizza> pizzas = new ArrayList<>();
-                while (resultSet.next()) {
-                    int size = resultSet.getInt(3);
-                    pizzas.add(DeliveryOrder.Pizza.builder().size(DeliveryOrder.Pizza.Size.values()[size]).build());
-                }
-
-                deliveryOrder = DeliveryOrder.builder()
-                        .ref(dor)
-                        .kitchenOrderRef(kitchenOrderRef)
-                        .onlineOrderRef(onlineOrderRef)
-                        .eventLog(eventLog)
-                        .pizzas(pizzas)
-                        .build();
-                deliveryOrder.setState(DeliveryOrder.State.values()[state]);
-            }
+            deliveryOrder = rehydrateDeliveryOrder(connection, statement, ref);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to retrieve DeliveryOrder from DELIVERY_ORDERS table: ", e);
         }
@@ -106,38 +82,44 @@ public class EmbeddedJdbcDeliveryOrderRepository implements DeliveryOrderReposit
 
     @Override
     public DeliveryOrder findByKitchenOrderRef(KitchenOrderRef kitchenOrderRef) {
-        DeliveryOrder deliveryOrder = null;
+        DeliveryOrder deliveryOrder;
         try (Connection connection = pool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT REF, KITCHEN_ORDER_REF, ONLINE_ORDER_REF, STATE FROM DELIVERY_ORDERS WHERE KITCHEN_ORDER_REF = ?");
-            statement.setString(1, kitchenOrderRef.getReference());
-            ResultSet resultSet = statement.executeQuery();
-            if (resultSet.first()) {
-                DeliveryOrderRef dor = new DeliveryOrderRef(resultSet.getString(1));
-                KitchenOrderRef kor = new KitchenOrderRef(resultSet.getString(2));
-                OnlineOrderRef onlineOrderRef = new OnlineOrderRef(resultSet.getString(3));
-                int state = resultSet.getInt(4);
-
-                statement = connection.prepareStatement("SELECT REF, INDEX, SIZE FROM DELIVERY_ORDER_PIZZAS WHERE REF = ? ORDER BY INDEX");
-                statement.setString(1, dor.getReference());
-                resultSet = statement.executeQuery();
-
-                List<DeliveryOrder.Pizza> pizzas = new ArrayList<>();
-                while (resultSet.next()) {
-                    int size = resultSet.getInt(3);
-                    pizzas.add(DeliveryOrder.Pizza.builder().size(DeliveryOrder.Pizza.Size.values()[size]).build());
-                }
-
-                deliveryOrder = DeliveryOrder.builder()
-                        .ref(dor)
-                        .kitchenOrderRef(kor)
-                        .onlineOrderRef(onlineOrderRef)
-                        .eventLog(eventLog)
-                        .pizzas(pizzas)
-                        .build();
-                deliveryOrder.setState(DeliveryOrder.State.values()[state]);
-            }
+            deliveryOrder = rehydrateDeliveryOrder(connection, statement, kitchenOrderRef);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to retrieve DeliveryOrder from DELIVERY_ORDERS table: ", e);
+        }
+        return deliveryOrder;
+    }
+
+    private DeliveryOrder rehydrateDeliveryOrder(Connection connection, PreparedStatement statement, Ref reference) throws SQLException {
+        DeliveryOrder deliveryOrder = null;
+        statement.setString(1, reference.getReference());
+        ResultSet resultSet = statement.executeQuery();
+        if (resultSet.first()) {
+            DeliveryOrderRef dor = new DeliveryOrderRef(resultSet.getString(1));
+            KitchenOrderRef kor = new KitchenOrderRef(resultSet.getString(2));
+            OnlineOrderRef onlineOrderRef = new OnlineOrderRef(resultSet.getString(3));
+            int state = resultSet.getInt(4);
+
+            statement = connection.prepareStatement("SELECT REF, INDEX, SIZE FROM DELIVERY_ORDER_PIZZAS WHERE REF = ? ORDER BY INDEX");
+            statement.setString(1, dor.getReference());
+            resultSet = statement.executeQuery();
+
+            List<DeliveryOrder.Pizza> pizzas = new ArrayList<>();
+            while (resultSet.next()) {
+                int size = resultSet.getInt(3);
+                pizzas.add(DeliveryOrder.Pizza.builder().size(DeliveryOrder.Pizza.Size.values()[size]).build());
+            }
+
+            deliveryOrder = DeliveryOrder.builder()
+                    .ref(dor)
+                    .kitchenOrderRef(kor)
+                    .onlineOrderRef(onlineOrderRef)
+                    .eventLog(eventLog)
+                    .pizzas(pizzas)
+                    .build();
+            deliveryOrder.setState(DeliveryOrder.State.values()[state]);
         }
         return deliveryOrder;
     }

@@ -13,12 +13,12 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class EmbeddedJdbcKitchenOrderRepository implements KitchenOrderRepository {
+final class EmbeddedJdbcKitchenOrderRepository implements KitchenOrderRepository {
     private final EventLog eventLog;
     private final Topic topic;
     private final JdbcConnectionPool pool;
 
-    public EmbeddedJdbcKitchenOrderRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
+    EmbeddedJdbcKitchenOrderRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
         this.eventLog = eventLog;
         this.topic = topic;
         this.pool = pool;
@@ -146,6 +146,7 @@ public class EmbeddedJdbcKitchenOrderRepository implements KitchenOrderRepositor
         return new KitchenOrderRef();
     }
 
+    @SuppressWarnings("Duplicates")
     @Override
     public void add(KitchenOrder kitchenOrder) {
         try (Connection connection = pool.getConnection()) {

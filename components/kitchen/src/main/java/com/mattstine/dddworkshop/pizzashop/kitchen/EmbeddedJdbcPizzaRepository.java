@@ -12,13 +12,13 @@ import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 
-public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
+final class EmbeddedJdbcPizzaRepository implements PizzaRepository {
 
     private final EventLog eventLog;
     private final Topic topic;
     private final JdbcConnectionPool pool;
 
-    public EmbeddedJdbcPizzaRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
+    EmbeddedJdbcPizzaRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
         this.eventLog = eventLog;
         this.topic = topic;
         this.pool = pool;
@@ -31,7 +31,7 @@ public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
             throw new RuntimeException("Unable to initialize PIZZAS table: ", e);
         }
 
-        eventLog.subscribe(new Topic("pizzas"), e -> {
+        eventLog.subscribe(topic, e -> {
             if (e instanceof PizzaPrepStartedEvent) {
                 PizzaPrepStartedEvent ppse = (PizzaPrepStartedEvent) e;
                 try (Connection connection = pool.getConnection()) {
@@ -88,19 +88,7 @@ public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
             statement.setString(1, kitchenOrderRef.getReference());
             ResultSet resultSet = statement.executeQuery();
             while (resultSet.next()) {
-                PizzaRef pizzaRef = new PizzaRef(resultSet.getString(1));
-                int size = resultSet.getInt(2);
-                KitchenOrderRef kor = new KitchenOrderRef(resultSet.getString(3));
-                int state = resultSet.getInt(4);
-
-                Pizza pizza = Pizza.builder()
-                        .ref(pizzaRef)
-                        .size(Pizza.Size.values()[size])
-                        .kitchenOrderRef(kor)
-                        .eventLog(eventLog)
-                        .build();
-                pizza.setState(Pizza.State.values()[state]);
-                pizzas.add(pizza);
+                pizzas.add(buildPizza(resultSet));
             }
 
         } catch (SQLException e) {
@@ -127,7 +115,7 @@ public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
             throw new RuntimeException("Unable to insert Pizza into PIZZAS table: ", e);
         }
 
-        eventLog.publish(new Topic("pizzas"), new PizzaAddedEvent(pizza.getRef(), pizza.state()));
+        eventLog.publish(topic, new PizzaAddedEvent(pizza.getRef(), pizza.state()));
     }
 
     @Override
@@ -135,31 +123,37 @@ public class EmbeddedJdbcPizzaRepository implements PizzaRepository {
         Pizza pizza;
         try (Connection connection = pool.getConnection()) {
             PreparedStatement statement = connection.prepareStatement("SELECT REF, SIZE, KITCHEN_ORDER_REF, STATE FROM PIZZAS WHERE REF = ?");
-            pizza = rehydratePizza(connection, statement, ref);
+            pizza = rehydratePizza(statement, ref);
         } catch (SQLException e) {
             throw new RuntimeException("Unable to retrieve Pizza from PIZZAS table: ", e);
         }
         return pizza;
     }
 
-    private Pizza rehydratePizza(Connection connection, PreparedStatement statement, Ref reference) throws SQLException {
+    private Pizza rehydratePizza(PreparedStatement statement, Ref reference) throws SQLException {
         Pizza pizza = null;
         statement.setString(1, reference.getReference());
         ResultSet resultSet = statement.executeQuery();
         if (resultSet.first()) {
-            PizzaRef pizzaRef = new PizzaRef(resultSet.getString(1));
-            int size = resultSet.getInt(2);
-            KitchenOrderRef kitchenOrderRef = new KitchenOrderRef(resultSet.getString(3));
-            int state = resultSet.getInt(4);
-
-            pizza = Pizza.builder()
-                    .ref(pizzaRef)
-                    .size(Pizza.Size.values()[size])
-                    .kitchenOrderRef(kitchenOrderRef)
-                    .eventLog(eventLog)
-                    .build();
-            pizza.setState(Pizza.State.values()[state]);
+            pizza = buildPizza(resultSet);
         }
+        return pizza;
+    }
+
+    private Pizza buildPizza(ResultSet resultSet) throws SQLException {
+        Pizza pizza;
+        PizzaRef pizzaRef = new PizzaRef(resultSet.getString(1));
+        int size = resultSet.getInt(2);
+        KitchenOrderRef kitchenOrderRef = new KitchenOrderRef(resultSet.getString(3));
+        int state = resultSet.getInt(4);
+
+        pizza = Pizza.builder()
+                .ref(pizzaRef)
+                .size(Pizza.Size.values()[size])
+                .kitchenOrderRef(kitchenOrderRef)
+                .eventLog(eventLog)
+                .build();
+        pizza.setState(Pizza.State.values()[state]);
         return pizza;
     }
 }

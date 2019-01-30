@@ -19,63 +19,63 @@ import static org.mockito.Mockito.mock;
  * @author Matt Stine
  */
 public class EmbeddedJdbcPaymentRepositoryIntegrationTests {
-	private InProcessEventLog eventLog;
-	private PaymentRepository repository;
-	private PaymentRef ref;
-	private Payment payment;
-	private JdbcConnectionPool pool;
+    private InProcessEventLog eventLog;
+    private PaymentRepository repository;
+    private PaymentRef ref;
+    private Payment payment;
+    private JdbcConnectionPool pool;
 
-	@Before
-	public void setUp() {
-		pool = JdbcConnectionPool.create("jdbc:h2:mem:test", "", "");
+    @Before
+    public void setUp() {
+        pool = JdbcConnectionPool.create("jdbc:h2:mem:test", "", "");
 
-		eventLog = InProcessEventLog.instance();
-		repository = new EmbeddedJdbcPaymentRepository(eventLog,
-				new Topic("payments"),
-				pool);
-		ref = repository.nextIdentity();
-		payment = Payment.builder()
-				.ref(ref)
-				.amount(Amount.of(10, 0))
-				.paymentProcessor(mock(PaymentProcessor.class))
-				.eventLog(eventLog)
-				.build();
-	}
+        eventLog = InProcessEventLog.instance();
+        repository = new EmbeddedJdbcPaymentRepository(eventLog,
+                new Topic("payments"),
+                pool);
+        ref = repository.nextIdentity();
+        payment = Payment.builder()
+                .ref(ref)
+                .amount(Amount.of(10, 0))
+                .paymentProcessor(mock(PaymentProcessor.class))
+                .eventLog(eventLog)
+                .build();
+    }
 
-	@After
-	public void tearDown() throws SQLException {
-		Connection connection = pool.getConnection();
-		PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
-		statement.execute();
-		connection.close();
+    @After
+    public void tearDown() throws SQLException {
+        Connection connection = pool.getConnection();
+        PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
+        statement.execute();
+        connection.close();
 
-		pool.dispose();
-		eventLog.purgeSubscribers();
-	}
+        pool.dispose();
+        eventLog.purgeSubscribers();
+    }
 
-	@Test
-	public void find_by_ref_hydrates_requested_payment() {
-		repository.add(payment);
-		payment.request();
+    @Test
+    public void find_by_ref_hydrates_requested_payment() {
+        repository.add(payment);
+        payment.request();
 
-		assertThat(repository.findByRef(ref)).isEqualTo(payment);
-	}
+        assertThat(repository.findByRef(ref)).isEqualTo(payment);
+    }
 
-	@Test
-	public void find_by_ref_hydrates_successful_payment() {
-		repository.add(payment);
-		payment.request();
-		payment.markSuccessful();
+    @Test
+    public void find_by_ref_hydrates_successful_payment() {
+        repository.add(payment);
+        payment.request();
+        payment.markSuccessful();
 
-		assertThat(repository.findByRef(ref)).isEqualTo(payment);
-	}
+        assertThat(repository.findByRef(ref)).isEqualTo(payment);
+    }
 
-	@Test
-	public void find_by_ref_hydrates_failed_payment() {
-		repository.add(payment);
-		payment.request();
-		payment.markFailed();
+    @Test
+    public void find_by_ref_hydrates_failed_payment() {
+        repository.add(payment);
+        payment.request();
+        payment.markFailed();
 
-		assertThat(repository.findByRef(ref)).isEqualTo(payment);
-	}
+        assertThat(repository.findByRef(ref)).isEqualTo(payment);
+    }
 }

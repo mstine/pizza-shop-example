@@ -9,6 +9,6 @@ import lombok.experimental.NonFinal;
  */
 @Value
 public class PaymentSuccessfulEvent implements Event {
-	@NonFinal
-	PaymentRef ref;
+    @NonFinal
+    PaymentRef ref;
 }

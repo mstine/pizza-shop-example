@@ -7,16 +7,19 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Matt Stine
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class InProcessEventLog implements EventLog {
+    private static InProcessEventLog singleton;
     private final Map<Topic, List<EventHandler>> topics = new HashMap<>();
     private final Map<Topic, List<Event>> events = new HashMap<>();
-    private static InProcessEventLog singleton;
 
     public static InProcessEventLog instance() {
         if (singleton == null) {

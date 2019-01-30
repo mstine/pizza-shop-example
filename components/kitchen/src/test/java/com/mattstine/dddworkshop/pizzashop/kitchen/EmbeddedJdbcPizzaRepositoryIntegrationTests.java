@@ -51,7 +51,6 @@ public class EmbeddedJdbcPizzaRepositoryIntegrationTests {
     }
 
 
-
     @Test
     public void find_by_ref_hydrates_prepping_pizza() {
         repository.add(pizza);

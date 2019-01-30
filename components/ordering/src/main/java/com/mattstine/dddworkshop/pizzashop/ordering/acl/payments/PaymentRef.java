@@ -13,6 +13,6 @@ import lombok.experimental.NonFinal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentRef implements Ref {
-	@NonFinal
-	String reference;
+    @NonFinal
+    String reference;
 }

@@ -23,7 +23,6 @@ final class InProcessEventSourcedOnlineOrderRepository extends InProcessEventSou
 
         eventLog.subscribe(topic, (e) -> {
             if (e instanceof PaymentRefAssignedEvent) {
-                @SuppressWarnings("SpellCheckingInspection")
                 PaymentRefAssignedEvent prae = (PaymentRefAssignedEvent) e;
                 this.paymentRefToOrderRef.put(prae.getPaymentRef(), prae.getRef());
             }

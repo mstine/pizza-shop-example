@@ -6,7 +6,7 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.domain.valuetypes.Amou
  * @author Matt Stine
  */
 public interface PaymentService {
-	PaymentRef createPaymentOf(Amount of);
+    PaymentRef createPaymentOf(Amount of);
 
-	void requestPaymentFor(PaymentRef ref);
+    void requestPaymentFor(PaymentRef ref);
 }

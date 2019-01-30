@@ -24,216 +24,216 @@ import static org.mockito.Mockito.when;
 
 public class DefaultKitchenServiceWithJdbcIntegrationTests {
 
-	private InProcessEventLog eventLog;
-	private JdbcConnectionPool pool;
-	private KitchenService kitchenService;
-	private OrderingService orderingService;
-	private KitchenOrderRepository kitchenOrderRepository;
-	private PizzaRepository pizzaRepository;
-	private KitchenOrderRef kitchenOrderRef;
-	private KitchenOrder kitchenOrder;
+    private InProcessEventLog eventLog;
+    private JdbcConnectionPool pool;
+    private KitchenService kitchenService;
+    private OrderingService orderingService;
+    private KitchenOrderRepository kitchenOrderRepository;
+    private PizzaRepository pizzaRepository;
+    private KitchenOrderRef kitchenOrderRef;
+    private KitchenOrder kitchenOrder;
 
-	@Before
-	public void setUp() {
-		eventLog = InProcessEventLog.instance();
-		pool = JdbcConnectionPool.create("jdbc:h2:mem:test;MVCC=FALSE", "", "");
-		kitchenOrderRepository = new EmbeddedJdbcKitchenOrderRepository(eventLog,
-				new Topic("kitchen_orders"), pool);
-		pizzaRepository = new EmbeddedJdbcPizzaRepository(eventLog,
-				new Topic("pizzas"), pool);
-		orderingService = mock(OrderingService.class);
-		kitchenService = new DefaultKitchenService(eventLog, kitchenOrderRepository, pizzaRepository, orderingService);
-		kitchenOrderRef = kitchenOrderRepository.nextIdentity();
-		kitchenOrder = KitchenOrder.builder()
-				.ref(kitchenOrderRef)
-				.onlineOrderRef(new OnlineOrderRef(RefStringGenerator.generateRefString()))
-				.eventLog(eventLog)
-				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
-				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.LARGE).build())
-				.build();
-		kitchenOrderRepository.add(kitchenOrder);
-	}
+    @Before
+    public void setUp() {
+        eventLog = InProcessEventLog.instance();
+        pool = JdbcConnectionPool.create("jdbc:h2:mem:test;MVCC=FALSE", "", "");
+        kitchenOrderRepository = new EmbeddedJdbcKitchenOrderRepository(eventLog,
+                new Topic("kitchen_orders"), pool);
+        pizzaRepository = new EmbeddedJdbcPizzaRepository(eventLog,
+                new Topic("pizzas"), pool);
+        orderingService = mock(OrderingService.class);
+        kitchenService = new DefaultKitchenService(eventLog, kitchenOrderRepository, pizzaRepository, orderingService);
+        kitchenOrderRef = kitchenOrderRepository.nextIdentity();
+        kitchenOrder = KitchenOrder.builder()
+                .ref(kitchenOrderRef)
+                .onlineOrderRef(new OnlineOrderRef(RefStringGenerator.generateRefString()))
+                .eventLog(eventLog)
+                .pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
+                .pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.LARGE).build())
+                .build();
+        kitchenOrderRepository.add(kitchenOrder);
+    }
 
-	@After
-	public void tearDown() throws SQLException {
-		Connection connection = pool.getConnection();
-		PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
-		statement.execute();
-		connection.close();
+    @After
+    public void tearDown() throws SQLException {
+        Connection connection = pool.getConnection();
+        PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
+        statement.execute();
+        connection.close();
 
-		pool.dispose();
-		this.eventLog.purgeSubscribers();
-	}
+        pool.dispose();
+        this.eventLog.purgeSubscribers();
+    }
 
-	@Test
-	public void on_orderPaidEvent_add_to_queue() {
-		OnlineOrderRef ref = new OnlineOrderRef(RefStringGenerator.generateRefString());
-		OnlineOrderPaidEvent orderPaidEvent = new OnlineOrderPaidEvent(ref);
+    @Test
+    public void on_orderPaidEvent_add_to_queue() {
+        OnlineOrderRef ref = new OnlineOrderRef(RefStringGenerator.generateRefString());
+        OnlineOrderPaidEvent orderPaidEvent = new OnlineOrderPaidEvent(ref);
 
-		OnlineOrder onlineOrder = OnlineOrder.builder()
-				.type(OnlineOrder.Type.PICKUP)
-				.eventLog(eventLog)
-				.ref(ref)
-				.build();
+        OnlineOrder onlineOrder = OnlineOrder.builder()
+                .type(OnlineOrder.Type.PICKUP)
+                .eventLog(eventLog)
+                .ref(ref)
+                .build();
 
-		onlineOrder.addPizza(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.builder()
-				.size(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.Size.MEDIUM)
-				.build());
+        onlineOrder.addPizza(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.builder()
+                .size(com.mattstine.dddworkshop.pizzashop.kitchen.acl.ordering.Pizza.Size.MEDIUM)
+                .build());
 
-		when(orderingService.findByRef(eq(ref))).thenReturn(onlineOrder);
+        when(orderingService.findByRef(eq(ref))).thenReturn(onlineOrder);
 
-		eventLog.publish(new Topic("ordering"), orderPaidEvent);
+        eventLog.publish(new Topic("ordering"), orderPaidEvent);
 
-		KitchenOrder kitchenOrder = kitchenService.findKitchenOrderByOnlineOrderRef(ref);
-		assertThat(kitchenOrder).isNotNull();
-	}
+        KitchenOrder kitchenOrder = kitchenService.findKitchenOrderByOnlineOrderRef(ref);
+        assertThat(kitchenOrder).isNotNull();
+    }
 
-	@Test
-	public void on_kitchenOrderPrepStartedEvent_start_prep_on_all_pizzas() {
-		kitchenOrder.startPrep();
+    @Test
+    public void on_kitchenOrderPrepStartedEvent_start_prep_on_all_pizzas() {
+        kitchenOrder.startPrep();
 
-		Set<Pizza> pizzas = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
+        Set<Pizza> pizzas = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
 
-		assertThat(pizzas.size()).isEqualTo(2);
+        assertThat(pizzas.size()).isEqualTo(2);
 
-		assertThat(pizzas.stream()
-				.filter(pizza -> pizza.getSize() == Pizza.Size.MEDIUM)
-				.count()).isEqualTo(1);
+        assertThat(pizzas.stream()
+                .filter(pizza -> pizza.getSize() == Pizza.Size.MEDIUM)
+                .count()).isEqualTo(1);
 
-		assertThat(pizzas.stream()
-				.filter(pizza -> pizza.getSize() == Pizza.Size.LARGE)
-				.count()).isEqualTo(1);
+        assertThat(pizzas.stream()
+                .filter(pizza -> pizza.getSize() == Pizza.Size.LARGE)
+                .count()).isEqualTo(1);
 
-		assertThat(pizzas.stream()
-				.filter(pizza -> pizza.getState() == Pizza.State.PREPPING)
-				.count()).isEqualTo(2);
-	}
+        assertThat(pizzas.stream()
+                .filter(pizza -> pizza.getState() == Pizza.State.PREPPING)
+                .count()).isEqualTo(2);
+    }
 
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
-	@Test
-	public void on_pizzaPrepFinished_start_pizzaBake() {
-		kitchenOrder.startPrep();
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @Test
+    public void on_pizzaPrepFinished_start_pizzaBake() {
+        kitchenOrder.startPrep();
 
-		Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
+        Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
 
-		Pizza pizza = pizzasByKitchenOrderRef.stream()
-				.findFirst()
-				.get();
+        Pizza pizza = pizzasByKitchenOrderRef.stream()
+                .findFirst()
+                .get();
 
-		pizza.finishPrep();
+        pizza.finishPrep();
 
-		pizza = pizzaRepository.findByRef(pizza.getRef());
-		assertThat(pizza.isBaking()).isTrue();
-	}
+        pizza = pizzaRepository.findByRef(pizza.getRef());
+        assertThat(pizza.isBaking()).isTrue();
+    }
 
-	@Test
-	public void on_pizzaBakeStarted_start_orderBake() {
-		kitchenOrder.startPrep();
+    @Test
+    public void on_pizzaBakeStarted_start_orderBake() {
+        kitchenOrder.startPrep();
 
-		Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
+        Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
 
-		pizzasByKitchenOrderRef.forEach(Pizza::finishPrep);
+        pizzasByKitchenOrderRef.forEach(Pizza::finishPrep);
 
-		kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
-		assertThat(kitchenOrder.isBaking()).isTrue();
-	}
+        kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
+        assertThat(kitchenOrder.isBaking()).isTrue();
+    }
 
-	@Test
-	public void on_first_pizzaBakeFinished_start_orderAssembly() {
-		kitchenOrder.startPrep();
+    @Test
+    public void on_first_pizzaBakeFinished_start_orderAssembly() {
+        kitchenOrder.startPrep();
 
-		// Load pizzas that are prepping...
-		Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
-		pizzasByKitchenOrderRef.forEach(Pizza::finishPrep);
+        // Load pizzas that are prepping...
+        Set<Pizza> pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
+        pizzasByKitchenOrderRef.forEach(Pizza::finishPrep);
 
-		// Load pizzas that are baking...
-		pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
-		pizzasByKitchenOrderRef.stream()
-				.findFirst()
-				.ifPresent(Pizza::finishBake);
+        // Load pizzas that are baking...
+        pizzasByKitchenOrderRef = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef);
+        pizzasByKitchenOrderRef.stream()
+                .findFirst()
+                .ifPresent(Pizza::finishBake);
 
-		// Ensure order has started assembly...
-		kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
-		assertThat(kitchenOrder.hasStartedAssembly()).isTrue();
-	}
+        // Ensure order has started assembly...
+        kitchenOrder = kitchenOrderRepository.findByRef(kitchenOrderRef);
+        assertThat(kitchenOrder.hasStartedAssembly()).isTrue();
+    }
 
-	@Test
-	public void should_start_kitchenOrder_prep() {
-		kitchenService.startOrderPrep(kitchenOrderRef);
-		kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
-		assertThat(kitchenOrder.isPrepping()).isTrue();
-	}
+    @Test
+    public void should_start_kitchenOrder_prep() {
+        kitchenService.startOrderPrep(kitchenOrderRef);
+        kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
+        assertThat(kitchenOrder.isPrepping()).isTrue();
+    }
 
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
-	@Test
-	public void should_finish_pizza_prep() {
-		kitchenOrder.startPrep();
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @Test
+    public void should_finish_pizza_prep() {
+        kitchenOrder.startPrep();
 
-		Pizza pizza = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
-				.findFirst().get();
+        Pizza pizza = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
+                .findFirst().get();
 
-		PizzaRef ref = pizza.getRef();
-		kitchenService.finishPizzaPrep(ref);
-		pizza = kitchenService.findPizzaByRef(ref);
+        PizzaRef ref = pizza.getRef();
+        kitchenService.finishPizzaPrep(ref);
+        pizza = kitchenService.findPizzaByRef(ref);
 
-		assertThat(pizza.isBaking()).isTrue();
-	}
+        assertThat(pizza.isBaking()).isTrue();
+    }
 
-	@SuppressWarnings("OptionalGetWithoutIsPresent")
-	@Test
-	public void should_remove_pizza_from_oven() {
-		kitchenOrder.startPrep();
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
+    @Test
+    public void should_remove_pizza_from_oven() {
+        kitchenOrder.startPrep();
 
-		Pizza pizza = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
-				.findFirst().get();
+        Pizza pizza = kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef).stream()
+                .findFirst().get();
 
-		pizza.finishPrep();
+        pizza.finishPrep();
 
-		kitchenService.removePizzaFromOven(pizza.getRef());
+        kitchenService.removePizzaFromOven(pizza.getRef());
 
-		pizza = kitchenService.findPizzaByRef(pizza.getRef());
+        pizza = kitchenService.findPizzaByRef(pizza.getRef());
 
-		assertThat(pizza.hasFinishedBaking()).isTrue();
-	}
+        assertThat(pizza.hasFinishedBaking()).isTrue();
+    }
 
-	@Test
-	public void on_final_pizzaBakeFinished_finish_orderAssembly() {
-		kitchenOrder.startPrep();
+    @Test
+    public void on_final_pizzaBakeFinished_finish_orderAssembly() {
+        kitchenOrder.startPrep();
 
-		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
-				.forEach(Pizza::finishPrep);
+        kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+                .forEach(Pizza::finishPrep);
 
-		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
-				.forEach(pizza -> kitchenService.removePizzaFromOven(pizza.getRef()));
+        kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+                .forEach(pizza -> kitchenService.removePizzaFromOven(pizza.getRef()));
 
-		kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
+        kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
 
-		assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
-	}
+        assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
+    }
 
-	@Test
-	public void test_bug_only_one_pizza_would_never_finish() {
-		kitchenOrderRef = kitchenOrderRepository.nextIdentity();
+    @Test
+    public void test_bug_only_one_pizza_would_never_finish() {
+        kitchenOrderRef = kitchenOrderRepository.nextIdentity();
 
-		kitchenOrder = KitchenOrder.builder()
-				.ref(kitchenOrderRef)
-				.onlineOrderRef(new OnlineOrderRef())
-				.eventLog(eventLog)
-				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
-				.build();
-		kitchenOrderRepository.add(kitchenOrder);
+        kitchenOrder = KitchenOrder.builder()
+                .ref(kitchenOrderRef)
+                .onlineOrderRef(new OnlineOrderRef())
+                .eventLog(eventLog)
+                .pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
+                .build();
+        kitchenOrderRepository.add(kitchenOrder);
 
 
-		kitchenOrder.startPrep();
+        kitchenOrder.startPrep();
 
-		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
-				.forEach(Pizza::finishPrep);
+        kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+                .forEach(Pizza::finishPrep);
 
-		kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
-				.forEach(pizza -> kitchenService.removePizzaFromOven(pizza.getRef()));
+        kitchenService.findPizzasByKitchenOrderRef(kitchenOrderRef)
+                .forEach(pizza -> kitchenService.removePizzaFromOven(pizza.getRef()));
 
-		kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
+        kitchenOrder = kitchenService.findKitchenOrderByRef(kitchenOrderRef);
 
-		assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
-	}
+        assertThat(kitchenOrder.hasFinishedAssembly()).isTrue();
+    }
 }

@@ -15,12 +15,12 @@ import java.util.Optional;
 /**
  * @author Matt Stine
  */
-public class EmbeddedJdbcOnlineOrderRepository implements OnlineOrderRepository {
+final class EmbeddedJdbcOnlineOrderRepository implements OnlineOrderRepository {
     private final EventLog eventLog;
     private final Topic topic;
     private final JdbcConnectionPool pool;
 
-    public EmbeddedJdbcOnlineOrderRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
+    EmbeddedJdbcOnlineOrderRepository(EventLog eventLog, Topic topic, JdbcConnectionPool pool) {
         this.eventLog = eventLog;
         this.topic = topic;
         this.pool = pool;

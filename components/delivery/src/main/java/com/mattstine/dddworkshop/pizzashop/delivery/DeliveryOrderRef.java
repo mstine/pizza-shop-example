@@ -8,22 +8,22 @@ import lombok.Value;
  * @author Matt Stine
  */
 @Value
-public final class DeliveryOrderRef implements Ref {
-	public static final DeliveryOrderRef IDENTITY = new DeliveryOrderRef("");
-	private String reference;
+final class DeliveryOrderRef implements Ref {
+    public static final DeliveryOrderRef IDENTITY = new DeliveryOrderRef("");
+    private String reference;
 
-	@SuppressWarnings("WeakerAccess")
-	public DeliveryOrderRef() {
-		reference = RefStringGenerator.generateRefString();
-	}
+    @SuppressWarnings("WeakerAccess")
+    public DeliveryOrderRef() {
+        reference = RefStringGenerator.generateRefString();
+    }
 
-	@SuppressWarnings("SameParameterValue")
+    @SuppressWarnings("SameParameterValue")
     DeliveryOrderRef(String reference) {
-		this.reference = reference;
-	}
+        this.reference = reference;
+    }
 
-	@Override
-	public String getReference() {
-		return reference;
-	}
+    @Override
+    public String getReference() {
+        return reference;
+    }
 }

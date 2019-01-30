@@ -79,7 +79,6 @@ public class PizzaTests {
         assertThatIllegalStateException().isThrownBy(pizza::startBake);
     }
 
-    @SuppressWarnings("Duplicates")
     @Test
     public void finish_pizza_bake_updates_state() {
         pizza.startPrep();

@@ -28,62 +28,62 @@ import static org.mockito.Mockito.when;
  */
 public class DeliveryServiceWithJdbcIntegrationTests {
 
-	private InProcessEventLog eventLog;
-	private DeliveryService deliveryService;
-	private OrderingService orderingService;
-	private KitchenService kitchenService;
-	private JdbcConnectionPool pool;
+    private InProcessEventLog eventLog;
+    private DeliveryService deliveryService;
+    private OrderingService orderingService;
+    private KitchenService kitchenService;
+    private JdbcConnectionPool pool;
 
-	@Before
-	public void setUp() {
-		eventLog = InProcessEventLog.instance();
-		pool = JdbcConnectionPool.create("jdbc:h2:mem:test;MVCC=FALSE", "", "");
+    @Before
+    public void setUp() {
+        eventLog = InProcessEventLog.instance();
+        pool = JdbcConnectionPool.create("jdbc:h2:mem:test;MVCC=FALSE", "", "");
 
-		DeliveryOrderRepository deliveryOrderRepository = new EmbeddedJdbcDeliveryOrderRepository(eventLog,
-				new Topic("delivery_orders"),
-				pool);
-		orderingService = mock(OrderingService.class);
-		kitchenService = mock(KitchenService.class);
-		deliveryService = new DeliveryService(eventLog, deliveryOrderRepository, orderingService, kitchenService);
-	}
+        DeliveryOrderRepository deliveryOrderRepository = new EmbeddedJdbcDeliveryOrderRepository(eventLog,
+                new Topic("delivery_orders"),
+                pool);
+        orderingService = mock(OrderingService.class);
+        kitchenService = mock(KitchenService.class);
+        deliveryService = new DeliveryService(eventLog, deliveryOrderRepository, orderingService, kitchenService);
+    }
 
-	@After
-	public void tearDown() throws SQLException {
-		Connection connection = pool.getConnection();
-		PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
-		statement.execute();
-		connection.close();
+    @After
+    public void tearDown() throws SQLException {
+        Connection connection = pool.getConnection();
+        PreparedStatement statement = connection.prepareStatement("DROP ALL OBJECTS");
+        statement.execute();
+        connection.close();
 
-		pool.dispose();
-		this.eventLog.purgeSubscribers();
-	}
+        pool.dispose();
+        this.eventLog.purgeSubscribers();
+    }
 
-	@Test
-	public void on_kitchenOrderAssemblyFinished_add_to_queue() {
-		KitchenOrderRef kitchenOrderRef = new KitchenOrderRef(RefStringGenerator.generateRefString());
-		KitchenOrderAssemblyFinishedEvent kitchenOrderAssemblyFinishedEvent = new KitchenOrderAssemblyFinishedEvent(kitchenOrderRef);
+    @Test
+    public void on_kitchenOrderAssemblyFinished_add_to_queue() {
+        KitchenOrderRef kitchenOrderRef = new KitchenOrderRef(RefStringGenerator.generateRefString());
+        KitchenOrderAssemblyFinishedEvent kitchenOrderAssemblyFinishedEvent = new KitchenOrderAssemblyFinishedEvent(kitchenOrderRef);
 
-		OnlineOrderRef onlineOrderRef = new OnlineOrderRef(RefStringGenerator.generateRefString());
-		OnlineOrder onlineOrder = OnlineOrder.builder()
-				.type(OnlineOrder.Type.DELIVERY)
-				.eventLog(eventLog)
-				.ref(onlineOrderRef)
-				.build();
+        OnlineOrderRef onlineOrderRef = new OnlineOrderRef(RefStringGenerator.generateRefString());
+        OnlineOrder onlineOrder = OnlineOrder.builder()
+                .type(OnlineOrder.Type.DELIVERY)
+                .eventLog(eventLog)
+                .ref(onlineOrderRef)
+                .build();
 
-		KitchenOrder kitchenOrder = KitchenOrder.builder()
-				.ref(kitchenOrderRef)
-				.onlineOrderRef(onlineOrderRef)
-				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
-				.pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.LARGE).build())
-				.eventLog(eventLog)
-				.build();
+        KitchenOrder kitchenOrder = KitchenOrder.builder()
+                .ref(kitchenOrderRef)
+                .onlineOrderRef(onlineOrderRef)
+                .pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.MEDIUM).build())
+                .pizza(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.LARGE).build())
+                .eventLog(eventLog)
+                .build();
 
-		when(orderingService.findByRef(onlineOrderRef)).thenReturn(onlineOrder);
-		when(kitchenService.findKitchenOrderByRef(kitchenOrderRef)).thenReturn(kitchenOrder);
+        when(orderingService.findByRef(onlineOrderRef)).thenReturn(onlineOrder);
+        when(kitchenService.findKitchenOrderByRef(kitchenOrderRef)).thenReturn(kitchenOrder);
 
-		eventLog.publish(new Topic("kitchen_orders"), kitchenOrderAssemblyFinishedEvent);
+        eventLog.publish(new Topic("kitchen_orders"), kitchenOrderAssemblyFinishedEvent);
 
-		DeliveryOrder deliveryOrder = deliveryService.findDeliveryOrderByKitchenOrderRef(kitchenOrderRef);
-		assertThat(deliveryOrder).isNotNull();
-	}
+        DeliveryOrder deliveryOrder = deliveryService.findDeliveryOrderByKitchenOrderRef(kitchenOrderRef);
+        assertThat(deliveryOrder).isNotNull();
+    }
 }

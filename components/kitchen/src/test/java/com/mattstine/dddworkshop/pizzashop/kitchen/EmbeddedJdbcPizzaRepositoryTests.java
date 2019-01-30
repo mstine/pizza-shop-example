@@ -14,7 +14,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 public class EmbeddedJdbcPizzaRepositoryTests {

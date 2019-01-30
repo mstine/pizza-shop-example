@@ -9,6 +9,6 @@ import lombok.experimental.NonFinal;
  */
 @Value
 public class OnlineOrderPaidEvent implements Event {
-	@NonFinal
-	OnlineOrderRef ref;
+    @NonFinal
+    OnlineOrderRef ref;
 }

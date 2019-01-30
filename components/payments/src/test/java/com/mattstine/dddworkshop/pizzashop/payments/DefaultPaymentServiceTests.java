@@ -15,56 +15,56 @@ import static org.mockito.Mockito.*;
  */
 public class DefaultPaymentServiceTests {
 
-	private PaymentProcessor processor;
-	private PaymentRepository repository;
-	private EventLog eventLog;
-	private DefaultPaymentService paymentService;
+    private PaymentProcessor processor;
+    private PaymentRepository repository;
+    private EventLog eventLog;
+    private DefaultPaymentService paymentService;
 
-	@Before
-	public void setUp() {
-		processor = mock(PaymentProcessor.class);
-		repository = mock(PaymentRepository.class);
-		eventLog = mock(EventLog.class);
-		paymentService = new DefaultPaymentService(processor, repository, eventLog);
-	}
+    @Before
+    public void setUp() {
+        processor = mock(PaymentProcessor.class);
+        repository = mock(PaymentRepository.class);
+        eventLog = mock(EventLog.class);
+        paymentService = new DefaultPaymentService(processor, repository, eventLog);
+    }
 
-	@Test
-	public void subscribes_to_payment_processor_topic() {
-		verify(eventLog).subscribe(eq(new Topic("payment_processor")), isA(EventHandler.class));
-	}
+    @Test
+    public void subscribes_to_payment_processor_topic() {
+        verify(eventLog).subscribe(eq(new Topic("payment_processor")), isA(EventHandler.class));
+    }
 
-	@Test
-	public void creates_payment() {
-		PaymentRef ref = new PaymentRef();
-		when(repository.nextIdentity()).thenReturn(ref);
+    @Test
+    public void creates_payment() {
+        PaymentRef ref = new PaymentRef();
+        when(repository.nextIdentity()).thenReturn(ref);
 
-		Payment payment = Payment.builder()
-				.amount(Amount.of(10, 0))
-				.ref(ref)
-				.paymentProcessor(processor)
-				.eventLog(eventLog)
-				.build();
+        Payment payment = Payment.builder()
+                .amount(Amount.of(10, 0))
+                .ref(ref)
+                .paymentProcessor(processor)
+                .eventLog(eventLog)
+                .build();
 
-		assertThat(ref)
-				.isEqualTo(paymentService.createPaymentOf(Amount.of(10, 0)));
+        assertThat(ref)
+                .isEqualTo(paymentService.createPaymentOf(Amount.of(10, 0)));
 
-		verify(repository).add(eq(payment));
-	}
+        verify(repository).add(eq(payment));
+    }
 
-	@Test
-	public void requests_from_processor() {
-		PaymentRef ref = new PaymentRef();
-		Payment payment = Payment.builder()
-				.amount(Amount.of(10, 0))
-				.ref(ref)
-				.paymentProcessor(processor)
-				.eventLog(eventLog)
-				.build();
-		when(repository.findByRef(ref)).thenReturn(payment);
+    @Test
+    public void requests_from_processor() {
+        PaymentRef ref = new PaymentRef();
+        Payment payment = Payment.builder()
+                .amount(Amount.of(10, 0))
+                .ref(ref)
+                .paymentProcessor(processor)
+                .eventLog(eventLog)
+                .build();
+        when(repository.findByRef(ref)).thenReturn(payment);
 
-		paymentService.requestPaymentFor(ref);
+        paymentService.requestPaymentFor(ref);
 
-		assertThat(payment.isRequested()).isTrue();
-	}
+        assertThat(payment.isRequested()).isTrue();
+    }
 
 }

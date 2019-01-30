@@ -208,7 +208,6 @@ public final class OnlineOrder implements Aggregate {
                 onlineOrder.state = State.SUBMITTED;
                 return onlineOrder;
             } else if (onlineOrderEvent instanceof PaymentRefAssignedEvent) {
-                @SuppressWarnings("SpellCheckingInspection")
                 PaymentRefAssignedEvent prae = (PaymentRefAssignedEvent) onlineOrderEvent;
                 onlineOrder.paymentRef = prae.getPaymentRef();
                 return onlineOrder;

@@ -6,8 +6,8 @@ import lombok.Value;
 
 @Value
 public final class PizzaRef implements Ref {
-    String reference;
     public static final PizzaRef IDENTITY = new PizzaRef("");
+    String reference;
 
     public PizzaRef() {
         this.reference = RefStringGenerator.generateRefString();

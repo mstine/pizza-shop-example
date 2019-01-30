@@ -11,21 +11,21 @@ import lombok.Value;
 @Value
 public final class Pizza {
 
-	Size size;
+    Size size;
 
-	@SuppressWarnings("unused")
-	@Builder
-	private Pizza(@NonNull Size size) {
-		this.size = size;
-	}
+    @SuppressWarnings("unused")
+    @Builder
+    private Pizza(@NonNull Size size) {
+        this.size = size;
+    }
 
-	public enum Size {
-		MEDIUM(Amount.of(6, 0));
+    public enum Size {
+        MEDIUM(Amount.of(6, 0));
 
-		final Amount price;
+        final Amount price;
 
-		Size(Amount price) {
-			this.price = price;
-		}
-	}
+        Size(Amount price) {
+            this.price = price;
+        }
+    }
 }
