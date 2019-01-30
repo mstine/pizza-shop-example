@@ -18,7 +18,7 @@ public final class DeliveryOrderRef implements Ref {
 	}
 
 	@SuppressWarnings("SameParameterValue")
-	private DeliveryOrderRef(String reference) {
+    DeliveryOrderRef(String reference) {
 		this.reference = reference;
 	}
 

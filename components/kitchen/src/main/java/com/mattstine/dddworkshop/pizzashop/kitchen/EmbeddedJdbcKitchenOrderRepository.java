@@ -125,8 +125,8 @@ public class EmbeddedJdbcKitchenOrderRepository implements KitchenOrderRepositor
 
             List<KitchenOrder.Pizza> pizzas = new ArrayList<>();
             while (resultSet.next()) {
-                int index = resultSet.getInt(3);
-                pizzas.add(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.values()[index]).build());
+                int size = resultSet.getInt(3);
+                pizzas.add(KitchenOrder.Pizza.builder().size(KitchenOrder.Pizza.Size.values()[size]).build());
             }
 
             kitchenOrder = KitchenOrder.builder()
