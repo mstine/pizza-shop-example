@@ -1,6 +1,5 @@
 package com.mattstine.dddworkshop.pizzashop.kitchen;
 
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
@@ -133,8 +132,8 @@ public final class KitchenOrder implements Aggregate {
     }
 
     @Override
-    public BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> accumulatorFunction() {
-        return new Accumulator();
+    public BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> accumulatorFunction(EventLog eventLog) {
+        return new Accumulator(eventLog);
     }
 
     @Override
@@ -152,13 +151,19 @@ public final class KitchenOrder implements Aggregate {
 
     private static class Accumulator implements BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> {
 
+        private final EventLog eventLog;
+
+        Accumulator(EventLog eventLog) {
+            this.eventLog = eventLog;
+        }
+
         @Override
         public KitchenOrder apply(KitchenOrder kitchenOrder, KitchenOrderEvent kitchenOrderEvent) {
             if (kitchenOrderEvent instanceof KitchenOrderAddedEvent) {
                 KitchenOrderAddedEvent oae = (KitchenOrderAddedEvent) kitchenOrderEvent;
                 OrderState orderState = oae.getState();
                 return KitchenOrder.builder()
-                        .eventLog(InProcessEventLog.instance())
+                        .eventLog(eventLog)
                         .ref(orderState.getRef())
                         .onlineOrderRef(orderState.getOnlineOrderRef())
                         .pizzas(orderState.getPizzas())

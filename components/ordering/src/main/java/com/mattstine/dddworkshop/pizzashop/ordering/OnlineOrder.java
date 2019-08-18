@@ -1,7 +1,6 @@
 package com.mattstine.dddworkshop.pizzashop.ordering;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.domain.valuetypes.Amount;
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
@@ -164,8 +163,8 @@ public final class OnlineOrder implements Aggregate {
     }
 
     @Override
-    public BiFunction<OnlineOrder, OnlineOrderEvent, OnlineOrder> accumulatorFunction() {
-        return new Accumulator();
+    public BiFunction<OnlineOrder, OnlineOrderEvent, OnlineOrder> accumulatorFunction(EventLog eventLog) {
+        return new Accumulator(eventLog);
     }
 
     @Override
@@ -183,13 +182,19 @@ public final class OnlineOrder implements Aggregate {
 
     private static class Accumulator implements BiFunction<OnlineOrder, OnlineOrderEvent, OnlineOrder> {
 
+        private final EventLog eventLog;
+
+        Accumulator(EventLog eventLog) {
+            this.eventLog = eventLog;
+        }
+
         @Override
         public OnlineOrder apply(OnlineOrder onlineOrder, OnlineOrderEvent onlineOrderEvent) {
             if (onlineOrderEvent instanceof OnlineOrderAddedEvent) {
                 OnlineOrderAddedEvent oae = (OnlineOrderAddedEvent) onlineOrderEvent;
                 OrderState orderState = oae.getOrderState();
                 return OnlineOrder.builder()
-                        .eventLog(InProcessEventLog.instance())
+                        .eventLog(eventLog)
                         .ref(orderState.getOnlineOrderRef())
                         .type(orderState.getType())
                         .build();

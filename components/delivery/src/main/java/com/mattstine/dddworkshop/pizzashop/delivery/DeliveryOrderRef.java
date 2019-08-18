@@ -8,13 +8,13 @@ import lombok.Value;
  * @author Matt Stine
  */
 @Value
-final class DeliveryOrderRef implements Ref {
+public final class DeliveryOrderRef implements Ref {
     public static final DeliveryOrderRef IDENTITY = new DeliveryOrderRef("");
-    private String reference;
+    String reference;
 
     @SuppressWarnings("WeakerAccess")
     public DeliveryOrderRef() {
-        reference = RefStringGenerator.generateRefString();
+        this.reference = RefStringGenerator.generateRefString();
     }
 
     @SuppressWarnings("SameParameterValue")

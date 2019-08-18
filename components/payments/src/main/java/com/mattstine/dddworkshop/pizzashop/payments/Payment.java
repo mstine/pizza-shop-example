@@ -1,7 +1,6 @@
 package com.mattstine.dddworkshop.pizzashop.payments;
 
 import com.mattstine.dddworkshop.pizzashop.infrastructure.domain.valuetypes.Amount;
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
@@ -129,8 +128,8 @@ public final class Payment implements Aggregate {
     }
 
     @Override
-    public BiFunction<Payment, PaymentEvent, Payment> accumulatorFunction() {
-        return new Accumulator();
+    public BiFunction<Payment, PaymentEvent, Payment> accumulatorFunction(EventLog eventLog) {
+        return new Accumulator(eventLog);
     }
 
     @Override
@@ -143,6 +142,13 @@ public final class Payment implements Aggregate {
     }
 
     private static class Accumulator implements BiFunction<Payment, PaymentEvent, Payment> {
+
+        private final EventLog instance;
+
+        Accumulator(EventLog instance) {
+            this.instance = instance;
+        }
+
         @Override
         public Payment apply(Payment payment, PaymentEvent paymentEvent) {
             if (paymentEvent instanceof PaymentAddedEvent) {
@@ -152,7 +158,7 @@ public final class Payment implements Aggregate {
                         .amount(paymentState.getAmount())
                         .paymentProcessor(DummyPaymentProcessor.instance())
                         .ref(paymentState.getRef())
-                        .eventLog(InProcessEventLog.instance())
+                        .eventLog(instance)
                         .build();
             } else if (paymentEvent instanceof PaymentRequestedEvent) {
                 payment.state = State.REQUESTED;

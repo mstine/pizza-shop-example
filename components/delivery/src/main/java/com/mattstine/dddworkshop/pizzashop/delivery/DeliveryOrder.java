@@ -2,7 +2,6 @@ package com.mattstine.dddworkshop.pizzashop.delivery;
 
 import com.mattstine.dddworkshop.pizzashop.delivery.acl.kitchen.KitchenOrderRef;
 import com.mattstine.dddworkshop.pizzashop.delivery.acl.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
@@ -16,7 +15,7 @@ import java.util.function.BiFunction;
  * @author Matt Stine
  */
 @Value
-final class DeliveryOrder implements Aggregate {
+public final class DeliveryOrder implements Aggregate {
     DeliveryOrderRef ref;
     KitchenOrderRef kitchenOrderRef;
     OnlineOrderRef onlineOrderRef;
@@ -64,8 +63,8 @@ final class DeliveryOrder implements Aggregate {
     }
 
     @Override
-    public BiFunction<DeliveryOrder, DeliveryOrderEvent, DeliveryOrder> accumulatorFunction() {
-        return new Accumulator();
+    public BiFunction<DeliveryOrder, DeliveryOrderEvent, DeliveryOrder> accumulatorFunction(EventLog eventLog) {
+        return new Accumulator(eventLog);
     }
 
     @Override
@@ -83,6 +82,12 @@ final class DeliveryOrder implements Aggregate {
 
     private static class Accumulator implements BiFunction<DeliveryOrder, DeliveryOrderEvent, DeliveryOrder> {
 
+        private final EventLog eventLog;
+
+        Accumulator(EventLog eventLog) {
+            this.eventLog = eventLog;
+        }
+
         @SuppressWarnings("SpellCheckingInspection")
         @Override
         public DeliveryOrder apply(DeliveryOrder deliveryOrder, DeliveryOrderEvent deliveryOrderEvent) {
@@ -90,7 +95,7 @@ final class DeliveryOrder implements Aggregate {
                 DeliveryOrderAddedEvent doae = (DeliveryOrderAddedEvent) deliveryOrderEvent;
                 OrderState orderState = doae.getState();
                 return DeliveryOrder.builder()
-                        .eventLog(InProcessEventLog.instance())
+                        .eventLog(eventLog)
                         .ref(orderState.getRef())
                         .kitchenOrderRef(orderState.getKitchenOrderRef())
                         .onlineOrderRef(orderState.getOnlineOrderRef())

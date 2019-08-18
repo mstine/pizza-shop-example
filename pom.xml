@@ -11,10 +11,19 @@
 
     <modules>
         <module>components/delivery</module>
-        <module>components/infrastructure</module>
+        <module>adapters/delivery-in-mem-event-sourced</module>
+        <module>adapters/delivery-in-mem-jdbc</module>
+        <module>components/infrastructure-api</module>
+        <module>adapters/infrastructure-in-memory</module>
         <module>components/kitchen</module>
+        <module>adapters/kitchen-in-mem-event-sourced</module>
+        <module>adapters/kitchen-in-mem-jdbc</module>
         <module>components/ordering</module>
+        <module>adapters/ordering-in-mem-event-sourced</module>
+        <module>adapters/ordering-in-mem-jdbc</module>
         <module>components/payments</module>
+        <module>adapters/payments-in-mem-event-sourced</module>
+        <module>adapters/payments-in-mem-jdbc</module>
     </modules>
 
     <build>

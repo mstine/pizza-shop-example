@@ -134,7 +134,7 @@ public class KitchenOrderTests {
     @Test
     public void accumulator_apply_with_orderAddedEvent_returns_order() {
         KitchenOrderAddedEvent orderAddedEvent = new KitchenOrderAddedEvent(ref, kitchenOrder.state());
-        assertThat(kitchenOrder.accumulatorFunction().apply(kitchenOrder.identity(), orderAddedEvent)).isEqualTo(kitchenOrder);
+        assertThat(kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder.identity(), orderAddedEvent)).isEqualTo(kitchenOrder);
     }
 
     @Test
@@ -149,10 +149,10 @@ public class KitchenOrderTests {
         expectedKitchenOrder.startPrep();
 
         KitchenOrderAddedEvent orderAddedEvent = new KitchenOrderAddedEvent(ref, kitchenOrder.state());
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder.identity(), orderAddedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder.identity(), orderAddedEvent);
 
         KitchenOrderPrepStartedEvent orderPrepStartedEvent = new KitchenOrderPrepStartedEvent(ref);
-        assertThat(kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderPrepStartedEvent)).isEqualTo(expectedKitchenOrder);
+        assertThat(kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderPrepStartedEvent)).isEqualTo(expectedKitchenOrder);
     }
 
     @Test
@@ -168,13 +168,13 @@ public class KitchenOrderTests {
         expectedKitchenOrder.startBake();
 
         KitchenOrderAddedEvent orderAddedEvent = new KitchenOrderAddedEvent(ref, kitchenOrder.state());
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder.identity(), orderAddedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder.identity(), orderAddedEvent);
 
         KitchenOrderPrepStartedEvent orderPrepStartedEvent = new KitchenOrderPrepStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderPrepStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderPrepStartedEvent);
 
         KitchenOrderBakeStartedEvent orderBakeStartedEvent = new KitchenOrderBakeStartedEvent(ref);
-        assertThat(kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderBakeStartedEvent)).isEqualTo(expectedKitchenOrder);
+        assertThat(kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderBakeStartedEvent)).isEqualTo(expectedKitchenOrder);
     }
 
     @Test
@@ -191,16 +191,16 @@ public class KitchenOrderTests {
         expectedKitchenOrder.startAssembly();
 
         KitchenOrderAddedEvent orderAddedEvent = new KitchenOrderAddedEvent(ref, kitchenOrder.state());
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder.identity(), orderAddedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder.identity(), orderAddedEvent);
 
         KitchenOrderPrepStartedEvent orderPrepStartedEvent = new KitchenOrderPrepStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderPrepStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderPrepStartedEvent);
 
         KitchenOrderBakeStartedEvent orderBakeStartedEvent = new KitchenOrderBakeStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderBakeStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderBakeStartedEvent);
 
         KitchenOrderAssemblyStartedEvent orderAssemblyStartedEvent = new KitchenOrderAssemblyStartedEvent(ref);
-        assertThat(kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderAssemblyStartedEvent)).isEqualTo(expectedKitchenOrder);
+        assertThat(kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderAssemblyStartedEvent)).isEqualTo(expectedKitchenOrder);
     }
 
     @Test
@@ -218,18 +218,18 @@ public class KitchenOrderTests {
         expectedKitchenOrder.finishAssembly();
 
         KitchenOrderAddedEvent orderAddedEvent = new KitchenOrderAddedEvent(ref, kitchenOrder.state());
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder.identity(), orderAddedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder.identity(), orderAddedEvent);
 
         KitchenOrderPrepStartedEvent orderPrepStartedEvent = new KitchenOrderPrepStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderPrepStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderPrepStartedEvent);
 
         KitchenOrderBakeStartedEvent orderBakeStartedEvent = new KitchenOrderBakeStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderBakeStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderBakeStartedEvent);
 
         KitchenOrderAssemblyStartedEvent orderAssemblyStartedEvent = new KitchenOrderAssemblyStartedEvent(ref);
-        kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderAssemblyStartedEvent);
+        kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderAssemblyStartedEvent);
 
         KitchenOrderAssemblyFinishedEvent orderAssemblyFinishedEvent = new KitchenOrderAssemblyFinishedEvent(ref);
-        assertThat(kitchenOrder.accumulatorFunction().apply(kitchenOrder, orderAssemblyFinishedEvent)).isEqualTo(expectedKitchenOrder);
+        assertThat(kitchenOrder.accumulatorFunction(eventLog).apply(kitchenOrder, orderAssemblyFinishedEvent)).isEqualTo(expectedKitchenOrder);
     }
 }

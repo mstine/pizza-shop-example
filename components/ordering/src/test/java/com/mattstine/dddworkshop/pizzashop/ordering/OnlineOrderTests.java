@@ -145,7 +145,7 @@ public class OnlineOrderTests {
     @Test
     public void accumulator_apply_with_orderAddedEvent_returns_order() {
         OnlineOrderAddedEvent orderAddedEvent = new OnlineOrderAddedEvent(ref, onlineOrder.state());
-        assertThat(onlineOrder.accumulatorFunction().apply(onlineOrder.identity(), orderAddedEvent)).isEqualTo(onlineOrder);
+        assertThat(onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder.identity(), orderAddedEvent)).isEqualTo(onlineOrder);
     }
 
     @Test
@@ -159,7 +159,7 @@ public class OnlineOrderTests {
 
         PizzaAddedEvent pae = new PizzaAddedEvent(ref, pizza);
 
-        assertThat(onlineOrder.accumulatorFunction().apply(onlineOrder, pae)).isEqualTo(expectedOnlineOrder);
+        assertThat(onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, pae)).isEqualTo(expectedOnlineOrder);
     }
 
     @Test
@@ -173,11 +173,11 @@ public class OnlineOrderTests {
         expectedOnlineOrder.submit();
 
         PizzaAddedEvent pae = new PizzaAddedEvent(ref, pizza);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, pae);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, pae);
 
         OnlineOrderSubmittedEvent ose = new OnlineOrderSubmittedEvent(ref);
 
-        assertThat(onlineOrder.accumulatorFunction().apply(onlineOrder, ose)).isEqualTo(expectedOnlineOrder);
+        assertThat(onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, ose)).isEqualTo(expectedOnlineOrder);
     }
 
     @Test
@@ -194,13 +194,13 @@ public class OnlineOrderTests {
         expectedOnlineOrder.assignPaymentRef(paymentRef);
 
         PizzaAddedEvent pae = new PizzaAddedEvent(ref, pizza);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, pae);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, pae);
 
         OnlineOrderSubmittedEvent ose = new OnlineOrderSubmittedEvent(ref);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, ose);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, ose);
 
         PaymentRefAssignedEvent prae = new PaymentRefAssignedEvent(ref, paymentRef);
-        assertThat(onlineOrder.accumulatorFunction().apply(onlineOrder, prae)).isEqualTo(expectedOnlineOrder);
+        assertThat(onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, prae)).isEqualTo(expectedOnlineOrder);
     }
 
     @Test
@@ -219,17 +219,17 @@ public class OnlineOrderTests {
         expectedOnlineOrder.markPaid();
 
         PizzaAddedEvent pae = new PizzaAddedEvent(ref, pizza);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, pae);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, pae);
 
         OnlineOrderSubmittedEvent ose = new OnlineOrderSubmittedEvent(ref);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, ose);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, ose);
 
         PaymentRefAssignedEvent prae = new PaymentRefAssignedEvent(ref, paymentRef);
-        onlineOrder.accumulatorFunction().apply(onlineOrder, prae);
+        onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, prae);
 
         OnlineOrderPaidEvent ope = new OnlineOrderPaidEvent(ref);
 
-        assertThat(onlineOrder.accumulatorFunction().apply(onlineOrder, ope)).isEqualTo(expectedOnlineOrder);
+        assertThat(onlineOrder.accumulatorFunction(eventLog).apply(onlineOrder, ope)).isEqualTo(expectedOnlineOrder);
     }
 
 }
